@@ -2,9 +2,7 @@
 
 This repository provides the implementation of **A-HLFDM**, a hybrid soft-computing framework for forecasting highly volatile and non-stationary time series with mixed-frequency dynamics.
 
-A-HLFDM integrates causality-preserving preprocessing, adaptive VMD-based signal decomposition, and frequency-aligned modeling. It automatically selects key VMD hyperparameters (e.g., the number of modes and bandwidth penalty) through a data-driven optimization process, enabling robust extraction of intrinsic mode functions (IMFs). A joint energy–frequency analysis further partitions IMFs into low- and high-frequency components using a cumulative energy criterion.
-
-For forecasting, A-HLFDM adopts a frequency-aligned modeling strategy: low-frequency components are modeled using regression-based approaches to capture long-term trends, while high-frequency components are predicted using dependency-aware models to capture short-term fluctuations. Final forecasts are obtained through linear superposition of component-wise predictions.
+A-HLFDM combines causality-preserving preprocessing, adaptive VMD-based decomposition, and frequency-aligned modeling to improve forecasting accuracy, stability, and interpretability. It automatically selects VMD hyperparameters in a data-driven manner and partitions intrinsic mode functions (IMFs) into low- and high-frequency components using joint energy–frequency analysis. Frequency-aligned predictors are then applied to each component, and final forecasts are obtained through linear reconstruction.
 
 Some experimental results are omitted due to GitHub limitations; please contact the authors if needed.
 
@@ -12,27 +10,24 @@ Some experimental results are omitted due to GitHub limitations; please contact 
 
 ## Method Overview
 
-A-HLFDM is a frequency-aware forecasting framework designed for highly volatile and non-stationary time series. The framework follows five stages:
+A-HLFDM follows a five-stage pipeline:
 
 1. **Data Preprocessing**  
-   The raw time series is processed using a causality-preserving pipeline. Temporal descriptors (e.g., trailing statistics and differences) are constructed based only on historical observations, and anomalous values are detected using an Isolation Forest. Detected anomalies are corrected using a strictly causal strategy (e.g., trailing median), ensuring robustness without introducing look-ahead bias.
+   The raw series is purified using a causality-preserving procedure. Temporal features are constructed from historical data, anomalies are detected via Isolation Forest, and corrected using a strictly causal strategy.
 
-2. **Adaptive VMD Optimization and Decomposition**  
-   The purified series is decomposed into intrinsic mode functions (IMFs) using Variational Mode Decomposition (VMD). Key hyperparameters (e.g., the number of modes and bandwidth penalty) are automatically selected via a data-driven optimization process that jointly considers reconstruction accuracy and modal regularity.
+2. **Adaptive VMD Decomposition**  
+   The series is decomposed into intrinsic mode functions (IMFs) using VMD, with key hyperparameters selected automatically through data-driven optimization.
 
 3. **High–Low Frequency Partitioning**  
-   The extracted IMFs are characterized by both energy and frequency features. After sorting by frequency, a cumulative energy criterion is applied to partition IMFs into low-frequency (trend-dominated) and high-frequency (fluctuation-dominated) components.
+   IMFs are sorted by frequency and partitioned into low- and high-frequency groups based on a cumulative energy criterion.
 
 4. **Frequency-Aligned Forecasting**  
-   Forecasting models are assigned according to frequency characteristics:  
-   - Low-frequency components are modeled using regression-based approaches to capture smooth demand evolution.  
-   - High-frequency components are modeled using dependency-aware models to capture short-term fluctuations.  
-   Forecasting is performed in a rolling one-step-ahead manner with causality preserved.
+   Low-frequency components are modeled using regression-based approaches, while high-frequency components are modeled using dependency-aware models under a rolling one-step-ahead scheme.
 
 5. **Forecast Reconstruction**  
-   The final prediction is obtained by linearly aggregating the forecasts of all IMFs. This reconstruction preserves multi-scale information and integrates long-term trends with short-term variations.
+   Final predictions are obtained by linearly aggregating component-wise forecasts.
 
-This design enables effective modeling of mixed-frequency dynamics and provides an accurate, stable, and interpretable solution for forecasting volatile time series.
+This pipeline enables effective modeling of mixed-frequency dynamics for accurate, stable, and interpretable forecasting.
 
 ---
 
